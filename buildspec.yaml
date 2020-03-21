@@ -6,7 +6,7 @@ phases:
       java: openjdk8
   build:
     commands:
-      - mvn -B deploy
+      - mvn -B -Ps3 deploy
 
 cache:
   paths:

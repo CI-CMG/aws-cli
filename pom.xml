@@ -11,6 +11,8 @@
   <properties>
     <picocli.version>4.2.0</picocli.version>
     <slf4j.version>1.7.28</slf4j.version>
+    <s3-snapshot-repo>s3://cires-cmg-trackline-repository/snapshot</s3-snapshot-repo>
+    <s3-release-repo>s3://cires-cmg-trackline-repository/release</s3-release-repo>
   </properties>
 
   <dependencyManagement>
@@ -85,6 +87,14 @@
   </dependencies>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>com.gkatzioura.maven.cloud</groupId>
+        <artifactId>s3-storage-wagon</artifactId>
+        <version>2.3</version>
+      </extension>
+    </extensions>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -130,6 +140,53 @@
       </plugin>
     </plugins>
   </build>
+
+
+  <profiles>
+    <profile>
+      <id>s3</id>
+
+      <distributionManagement>
+        <snapshotRepository>
+          <id>trackline-snapshot</id>
+          <url>${s3-snapshot-repo}</url>
+        </snapshotRepository>
+        <repository>
+          <id>trackline-release</id>
+          <url>${s3-release-repo}</url>
+        </repository>
+      </distributionManagement>
+
+      <repositories>
+        <repository>
+          <id>trackline-snapshot</id>
+          <url>${s3-snapshot-repo}</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>trackline-release</id>
+          <url>${s3-release-repo}</url>
+          <releases>
+            <enabled>true</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+
+    </profile>
+
+
+  </profiles>
 
 
 </project>
