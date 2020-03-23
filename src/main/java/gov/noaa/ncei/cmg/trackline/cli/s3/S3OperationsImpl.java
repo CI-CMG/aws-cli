@@ -14,9 +14,7 @@ import com.amazonaws.services.s3.transfer.Upload;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class S3OperationsImpl implements S3Operations {
@@ -78,33 +76,27 @@ public class S3OperationsImpl implements S3Operations {
     System.out.println();
   }
 
-  private static void printProgress(long startTime, long total, long current) {
-    long eta = current == 0 ? 0 :
-        (total - current) * (System.currentTimeMillis() - startTime) / current;
-
-    String etaHms = current == 0 ? "N/A" :
-        String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(eta),
-            TimeUnit.MILLISECONDS.toMinutes(eta) % TimeUnit.HOURS.toMinutes(1),
-            TimeUnit.MILLISECONDS.toSeconds(eta) % TimeUnit.MINUTES.toSeconds(1));
-
-    StringBuilder string = new StringBuilder(140);
-    int percent = (int) (current * 100 / total);
-    string
-        .append('\r')
-//          .append(String.join("", Collections.nCopies(percent == 0 ? 2 : 2 - (int) (Math.log10(percent)), " ")))
-        .append(String.format(" %d%% [", percent))
-        .append(String.join("", Collections.nCopies(percent, "=")))
-        .append('>')
-        .append(String.join("", Collections.nCopies(100 - percent, " ")))
-        .append(']')
-//          .append(String.join("", Collections.nCopies((int) (Math.log10(total)) - (int) (Math.log10(current)), " ")))
-        .append(String.format(" %d/%d, ETA: %s", current, total, etaHms));
-
-    System.out.print(string);
+  // prints a simple text progressbar: [#####     ]
+  public static void printProgressBar(double pct) {
+    // if bar_size changes, then change erase_bar (in eraseProgressBar) to
+    // match.
+    final int bar_size = 40;
+    final String empty_bar = "                                        ";
+    final String filled_bar = "########################################";
+    int amt_full = (int) (bar_size * (pct / 100.0));
+    System.out.format("  [%s%s]", filled_bar.substring(0, amt_full),
+        empty_bar.substring(0, bar_size - amt_full));
   }
 
+  // erases the progress bar.
+  public static void eraseProgressBar() {
+    // erase_bar is bar_size (from printProgressBar) + 4 chars.
+    final String erase_bar = "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
+    System.out.format(erase_bar);
+  }
 
   private void transfer(long startTime, Transfer transfer) {
+    printProgressBar(0.0);
     do {
       try {
         Thread.sleep(100);
@@ -113,7 +105,9 @@ public class S3OperationsImpl implements S3Operations {
         throw new RuntimeException(e);
       }
       TransferProgress progress = transfer.getProgress();
-      printProgress(startTime, progress.getTotalBytesToTransfer(), progress.getBytesTransferred());
+      double pct = progress.getPercentTransferred();
+      eraseProgressBar();
+      printProgressBar(pct);
     } while (transfer.isDone() == false);
     TransferState state = transfer.getState();
     System.out.println(": " + state);
