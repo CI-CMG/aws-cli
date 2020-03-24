@@ -3,8 +3,10 @@ package gov.noaa.ncei.cmg.trackline.cli.s3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.AmazonS3URI;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -29,12 +31,20 @@ public class S3CpCommands implements Runnable {
   @Option(names = {"-r", "--recursive"}, description = "Command is  performed  on all files or objects under the specified directory or prefix.")
   private boolean recursive = false;
 
+  @Option(names = {"-i", "--include"}, description = "When recursive, don't exclude files or objects in the command that match the specified pattern. See https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob")
+  private String include;
+
+  @Option(names = {"-e", "--exclude"}, description = "When recursive, exclude all files or objects from the command that matches the specified pattern. See https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob")
+  private String exclude;
+
   @Override
   public void run() {
     new S3CpCommandsHandler(new S3OperationsImpl(AmazonS3ClientBuilder.defaultClient()),
         source,
         target,
         recursive,
+        include,
+        exclude,
         path -> {
           try {
             return Files.walk(path).filter(f -> !Files.isDirectory(f));
@@ -51,13 +61,17 @@ public class S3CpCommands implements Runnable {
     private final String source;
     private final String target;
     private final boolean recursive;
+    private final String include;
+    private final String exclude;
     private final Function<Path, Stream<Path>> listPaths;
 
-    S3CpCommandsHandler(S3Operations s3, String source, String target, boolean recursive, Function<Path, Stream<Path>> listPaths) {
+    S3CpCommandsHandler(S3Operations s3, String source, String target, boolean recursive, String include, String exclude, Function<Path, Stream<Path>> listPaths) {
       this.s3 = s3;
       this.source = source;
       this.target = target;
       this.recursive = recursive;
+      this.include = include;
+      this.exclude = exclude;
       this.listPaths = listPaths;
     }
 
@@ -86,6 +100,10 @@ public class S3CpCommands implements Runnable {
     }
 
 
+    private boolean incExc(Path path) {
+      return S3Utils.incExc(path, include, exclude);
+    }
+
     private void copy(String s, String t) {
       AmazonS3URI sUri = new AmazonS3URI(s);
       AmazonS3URI tUri = new AmazonS3URI(t);
@@ -99,8 +117,12 @@ public class S3CpCommands implements Runnable {
       if (recursive) {
         String prefix = sourceKey.isEmpty() ? sourceKey : sourceKey + "/";
         s3.forEachKey(sourceBucket, prefix, key -> {
-          String tk = targetKey.isEmpty() ? key : targetKey + "/" + key;
-          s3.copy(sourceBucket, prefix + key, targetBucket, tk);
+
+          if(incExc(Paths.get(key))) {
+            String tk = targetKey.isEmpty() ? key : targetKey + "/" + key;
+            s3.copy(sourceBucket, prefix + key, targetBucket, tk);
+          }
+
         });
       } else {
         s3.copy(sourceBucket, sourceKey, targetBucket, targetKey);
@@ -117,8 +139,12 @@ public class S3CpCommands implements Runnable {
       if (recursive) {
         String prefix = sourceKey.isEmpty() ? sourceKey : sourceKey + "/";
         s3.forEachKey(sourceBucket, prefix, key -> {
-          Path destFile = dest.resolve(key);
-          s3.download(sourceBucket, prefix + key, destFile);
+
+          if(incExc(Paths.get(key))) {
+            Path destFile = dest.resolve(key);
+            s3.download(sourceBucket, prefix + key, destFile);
+          }
+
         });
       } else {
         s3.download(sourceBucket, sourceKey, dest);
@@ -136,9 +162,14 @@ public class S3CpCommands implements Runnable {
       if (recursive) {
         try (Stream<Path> paths = listPaths.apply(source)) {
           paths.forEach(path -> {
-            String tail = source.relativize(path).toString();
-            String tk = targetKey.isEmpty() ? tail : targetKey + "/" + tail;
-            s3.upload(path, targetBucket, tk);
+
+            Path tail = source.relativize(path);
+
+            if(incExc(tail)) {
+              String tk = targetKey.isEmpty() ? tail.toString() : targetKey + "/" + tail.toString();
+              s3.upload(path, targetBucket, tk);
+            }
+
           });
         }
       } else {

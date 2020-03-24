@@ -2,6 +2,8 @@ package gov.noaa.ncei.cmg.trackline.cli.s3;
 
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.AmazonS3URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.apache.commons.lang3.StringUtils;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -20,11 +22,19 @@ public class S3RmCommands implements Runnable {
   @Option(names = {"-r", "--recursive"}, description = "Command is  performed  on all files or objects under the specified prefix.")
   private boolean recursive = false;
 
+  @Option(names = {"-i", "--include"}, description = "When recursive, don't exclude files or objects in the command that match the specified pattern. See https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob")
+  private String include;
+
+  @Option(names = {"-e", "--exclude"}, description = "When recursive, exclude all files or objects from the command that matches the specified pattern. IMPORTANT: Pay attention to the difference between '**' and '*'. Using '*' could delete more than expected.  a See https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob")
+  private String exclude;
+
   @Override
   public void run() {
     new S3RmCommandsHandler(new S3OperationsImpl(AmazonS3ClientBuilder.defaultClient()),
         path,
-        recursive
+        recursive,
+        include,
+        exclude
     ).run();
   }
 
@@ -33,12 +43,16 @@ public class S3RmCommands implements Runnable {
     private final S3Operations s3;
     private final String path;
     private final boolean recursive;
+    private final String include;
+    private final String exclude;
 
 
-    S3RmCommandsHandler(S3Operations s3, String path, boolean recursive) {
+    S3RmCommandsHandler(S3Operations s3, String path, boolean recursive, String include, String exclude) {
       this.s3 = s3;
       this.path = path;
       this.recursive = recursive;
+      this.include = include;
+      this.exclude = exclude;
     }
 
     public void run() {
@@ -53,10 +67,21 @@ public class S3RmCommands implements Runnable {
 
       if (recursive) {
         String prefix = victim.isEmpty() ? victim : victim + "/";
-        s3.forEachKey(bucket, prefix, key -> s3.deleteObject(bucket, prefix + key));
+        s3.forEachKey(bucket, prefix, key -> {
+
+          if(incExc(Paths.get(key))) {
+            s3.deleteObject(bucket, prefix + key);
+          }
+
+        });
       } else {
         s3.deleteObject(bucket, victim);
       }
     }
+
+    private boolean incExc(Path path) {
+      return S3Utils.incExc(path, include, exclude);
+    }
+
   }
 }
