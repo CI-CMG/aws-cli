@@ -6,7 +6,7 @@
 
   <groupId>edu.colorado.cires.cmg.aws</groupId>
   <artifactId>aws-cli</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
 
   <properties>
     <picocli.version>4.2.0</picocli.version>
