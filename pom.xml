@@ -189,6 +189,20 @@
               <value>$1</value>
               <regex>true</regex>
             </replacementProperty>
+            <replacementProperty>
+              <property>git.branch</property>
+              <propertyOutputSuffix>dash</propertyOutputSuffix>
+              <token>^(\d+)\.(\d+)$</token>
+              <value>$1-$2</value>
+              <regex>true</regex>
+            </replacementProperty>
+            <replacementProperty>
+              <property>git.branch</property>
+              <propertyOutputSuffix>underscore</propertyOutputSuffix>
+              <token>^(\d+)\.(\d+)$</token>
+              <value>$1_$2</value>
+              <regex>true</regex>
+            </replacementProperty>
           </replacementProperties>
         </configuration>
       </plugin>
