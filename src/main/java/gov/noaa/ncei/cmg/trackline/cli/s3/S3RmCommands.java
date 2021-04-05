@@ -70,7 +70,7 @@ public class S3RmCommands implements Runnable {
         s3.forEachKey(bucket, prefix, key -> {
 
           if(incExc(Paths.get(key))) {
-            s3.deleteObject(bucket, prefix + key);
+            s3.deleteObject(bucket, key);
           }
 
         });

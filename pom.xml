@@ -15,12 +15,38 @@
     <s3-release-repo>s3://cires-cmg-trackline-repository/release</s3-release-repo>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>trackline-snapshot</id>
+      <url>${s3-snapshot-repo}</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>trackline-release</id>
+      <url>${s3-release-repo}</url>
+      <releases>
+        <enabled>true</enabled>
+        <checksumPolicy>fail</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>com.amazonaws</groupId>
         <artifactId>aws-java-sdk-bom</artifactId>
-        <version>1.11.747</version>
+        <version>1.11.990</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -138,6 +164,141 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>4.0.3</version>
+        <executions>
+          <execution>
+            <id>get-the-git-infos</id>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+            <phase>initialize</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <failOnNoGitDirectory>false</failOnNoGitDirectory>
+          <offline>true</offline>
+          <replacementProperties>
+            <replacementProperty>
+              <property>git.remote.origin.url</property>
+              <propertyOutputSuffix>suffix</propertyOutputSuffix>
+              <token>^.+github\.com.(.*)\.git$</token>
+              <value>$1</value>
+              <regex>true</regex>
+            </replacementProperty>
+          </replacementProperties>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.1.2</version>
+        <executions>
+          <execution>
+            <id>list-dependencies</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>list</goal>
+            </goals>
+            <configuration>
+              <outputFile>target/dependencies.txt</outputFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>set-dependency-prop</id>
+            <phase>initialize</phase>
+            <configuration>
+              <exportAntProperties>true</exportAntProperties>
+              <target>
+                <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="maven.plugin.classpath"/>
+                <var name="snapshot.list" value=""/>
+                <loadfile property="resolved.dependencies" srcFile="target/dependencies.txt"/>
+                <for param="line" list="${resolved.dependencies}" delimiter="${line.separator}">
+                  <sequential>
+                    <if>
+                      <contains string="@{line}" substring="SNAPSHOT"/>
+                      <then>
+                        <propertyregex property="snapshot.prop" override="true" input="@{line}" regexp="\s*([a-zA-Z0-9_\-\.:]+)\s*.*" select="\1"/>
+                        <if>
+                          <equals arg1="${snapshot.list}" arg2=""/>
+                          <then>
+                            <var name="snapshot.list" value="${snapshot.prop}"/>
+                          </then>
+                          <else>
+                            <var name="snapshot.list" value="${snapshot.list},${snapshot.prop}"/>
+                          </else>
+                        </if>
+                      </then>
+                    </if>
+                  </sequential>
+                </for>
+                <echo>${snapshot.list}</echo>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>ant-contrib</groupId>
+            <artifactId>ant-contrib</artifactId>
+            <version>1.0b3</version>
+            <exclusions>
+              <exclusion>
+                <groupId>ant</groupId>
+                <artifactId>ant</artifactId>
+              </exclusion>
+            </exclusions>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant-nodeps</artifactId>
+            <version>1.8.1</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>cloudformation</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/cloudformation</outputDirectory>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+              <delimiters>
+                <delimiter>@</delimiter>
+              </delimiters>
+              <resources>
+                <resource>
+                  <directory>cloudformation</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 
@@ -156,32 +317,6 @@
           <url>${s3-release-repo}</url>
         </repository>
       </distributionManagement>
-
-      <repositories>
-        <repository>
-          <id>trackline-snapshot</id>
-          <url>${s3-snapshot-repo}</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>always</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-          </snapshots>
-        </repository>
-        <repository>
-          <id>trackline-release</id>
-          <url>${s3-release-repo}</url>
-          <releases>
-            <enabled>true</enabled>
-            <checksumPolicy>fail</checksumPolicy>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </repository>
-      </repositories>
 
     </profile>
 

@@ -112,7 +112,12 @@ public class S3OperationsImpl implements S3Operations {
     TransferState state = transfer.getState();
     System.out.println(": " + state);
     if (state == TransferState.Failed || state == TransferState.Canceled) {
-      throw new RuntimeException("Transfer Failed");
+      try {
+        transfer.waitForCompletion();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException("Transfer Failed", e);
+      }
     }
   }
 

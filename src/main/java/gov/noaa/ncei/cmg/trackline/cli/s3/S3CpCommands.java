@@ -120,7 +120,7 @@ public class S3CpCommands implements Runnable {
 
           if(incExc(Paths.get(key))) {
             String tk = targetKey.isEmpty() ? key : targetKey + "/" + key;
-            s3.copy(sourceBucket, prefix + key, targetBucket, tk);
+            s3.copy(sourceBucket, key, targetBucket, tk);
           }
 
         });
@@ -142,7 +142,7 @@ public class S3CpCommands implements Runnable {
 
           if(incExc(Paths.get(key))) {
             Path destFile = dest.resolve(key);
-            s3.download(sourceBucket, prefix + key, destFile);
+            s3.download(sourceBucket, key, destFile);
           }
 
         });
