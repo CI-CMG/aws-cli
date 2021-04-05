@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: build-@project.artifactId@-@git.branch@
+Description: build-@project.artifactId@-@git.branch.dash@
 
 Parameters:
   RolePermissionsBoundary:
@@ -157,7 +157,7 @@ Resources:
   CodeBuild:
     Type: AWS::CodeBuild::Project
     Properties:
-      Name: @project.artifactId@_@git.branch@-build
+      Name: @project.artifactId@_@git.branch.underscore@-build
       ServiceRole: !GetAtt CodeBuildRole.Arn
       Artifacts:
         Type: CODEPIPELINE
