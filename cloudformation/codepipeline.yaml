@@ -229,7 +229,7 @@ Resources:
   SlackNotification:
     Type: AWS::CodeStarNotifications::NotificationRule
     Properties:
-      Name: @project.artifactId@_@git.branch@
+      Name: @project.artifactId@_@git.branch.underscore@
       DetailType: FULL
       Resource: !Sub arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:${CodePipeline}
       EventTypeIds:
