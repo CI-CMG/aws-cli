@@ -6,8 +6,8 @@ phases:
       java: openjdk8
   build:
     commands:
-      - mvn -B -Ps3 $BUILD_OPTS deploy
+      - mvn -B deploy
 
-cache:
-  paths:
-    - '/root/.m2/**/*'
+artifacts:
+  files:
+    - '**/*'
