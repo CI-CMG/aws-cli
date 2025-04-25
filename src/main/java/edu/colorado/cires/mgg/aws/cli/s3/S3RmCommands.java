@@ -1,8 +1,7 @@
-package gov.noaa.ncei.cmg.trackline.cli.s3;
+package edu.colorado.cires.mgg.aws.cli.s3;
 
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.AmazonS3URI;
-import gov.noaa.ncei.cmg.trackline.cli.AwsCommands;
+import edu.colorado.cires.mgg.aws.cli.AwsCommands;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.lang3.StringUtils;

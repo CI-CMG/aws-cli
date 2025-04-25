@@ -1,8 +1,9 @@
-package gov.noaa.ncei.cmg.trackline.cli;
+package edu.colorado.cires.mgg.aws.cli;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import gov.noaa.ncei.cmg.trackline.cli.s3.S3Commands;
+import edu.colorado.cires.mgg.aws.cli.s3.S3Commands;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
@@ -22,6 +23,8 @@ public class AwsCommands implements Runnable {
   @Spec
   private CommandSpec spec;
 
+  @SuppressFBWarnings(value = "EI_EXPOSE_STATIC_REP2", justification = "This is exposed for testing only")
+  @Deprecated
   public static void setS3(AmazonS3 override) {
     s3 = override;
   }

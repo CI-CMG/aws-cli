@@ -1,4 +1,4 @@
-package gov.noaa.ncei.cmg.trackline.cli;
+package edu.colorado.cires.mgg.aws.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3;

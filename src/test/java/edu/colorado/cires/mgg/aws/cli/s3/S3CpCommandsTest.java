@@ -1,4 +1,4 @@
-package gov.noaa.ncei.cmg.trackline.cli.s3;
+package edu.colorado.cires.mgg.aws.cli.s3;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -6,7 +6,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import gov.noaa.ncei.cmg.trackline.cli.s3.S3CpCommands.S3CpCommandsHandler;
+import edu.colorado.cires.mgg.aws.cli.s3.S3CpCommands.S3CpCommandsHandler;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;

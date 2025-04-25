@@ -1,4 +1,4 @@
-package gov.noaa.ncei.cmg.trackline.cli.s3;
+package edu.colorado.cires.mgg.aws.cli.s3;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
