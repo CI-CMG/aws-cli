@@ -30,9 +30,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:https://github.com/CI-CMG/aws-trackline-cli.git</connection>
-    <developerConnection>scm:git:https://github.com/CI-CMG/aws-trackline-cli.git</developerConnection>
-    <url>https://github.com/CI-CMG/aws-trackline-cli</url>
+    <connection>scm:git:https://github.com/CI-CMG/aws-cli.git</connection>
+    <developerConnection>scm:git:https://github.com/CI-CMG/aws-cli.git</developerConnection>
+    <url>https://github.com/CI-CMG/aws-cli</url>
     <tag>HEAD</tag>
   </scm>
 
