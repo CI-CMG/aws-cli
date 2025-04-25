@@ -231,9 +231,9 @@ class S3CpCommandsTest {
     doAnswer(invocation -> {
       Consumer<String> consumer = invocation.getArgument(2, Consumer.class);
       Arrays.asList(
-          "dir/file1.txt",
-          "dir/file2.txt",
-          "file3.txt"
+          "cats/dir/file1.txt",
+          "cats/dir/file2.txt",
+          "cats/file3.txt"
       ).forEach(consumer::accept);
       return null;
     }).when(s3).forEachKey(eq("foo-bucket"), eq("cats/"), any(Consumer.class));
@@ -315,11 +315,11 @@ class S3CpCommandsTest {
     doAnswer(invocation -> {
       Consumer<String> consumer = invocation.getArgument(2, Consumer.class);
       Arrays.asList(
-          "dir/file1.txt",
-          "dir/file2.txt",
-          "file3.txt",
-          "dir/file4.zip",
-          "file5.zip"
+          "cats/dir/file1.txt",
+          "cats/dir/file2.txt",
+          "cats/file3.txt",
+          "cats/dir/file4.zip",
+          "cats/file5.zip"
       ).forEach(consumer::accept);
       return null;
     }).when(s3).forEachKey(eq("foo-bucket"), eq("cats/"), any(Consumer.class));
@@ -343,11 +343,11 @@ class S3CpCommandsTest {
     doAnswer(invocation -> {
       Consumer<String> consumer = invocation.getArgument(2, Consumer.class);
       Arrays.asList(
-          "dir/file1.txt",
-          "dir/file2.txt",
-          "file3.txt",
-          "dir/file4.zip",
-          "file5.zip"
+          "cats/dir/file1.txt",
+          "cats/dir/file2.txt",
+          "cats/file3.txt",
+          "cats/dir/file4.zip",
+          "cats/file5.zip"
       ).forEach(consumer::accept);
       return null;
     }).when(s3).forEachKey(eq("foo-bucket"), eq("cats/"), any(Consumer.class));
@@ -372,11 +372,11 @@ class S3CpCommandsTest {
     doAnswer(invocation -> {
       Consumer<String> consumer = invocation.getArgument(2, Consumer.class);
       Arrays.asList(
-          "dir/file1.txt",
-          "dir/file2.txt",
-          "file3.txt",
-          "dir/file4.zip",
-          "file5.zip"
+          "cats/dir/file1.txt",
+          "cats/dir/file2.txt",
+          "cats/file3.txt",
+          "cats/dir/file4.zip",
+          "cats/file5.zip"
       ).forEach(consumer::accept);
       return null;
     }).when(s3).forEachKey(eq("foo-bucket"), eq("cats/"), any(Consumer.class));
@@ -403,11 +403,11 @@ class S3CpCommandsTest {
     doAnswer(invocation -> {
       Consumer<String> consumer = invocation.getArgument(2, Consumer.class);
       Arrays.asList(
-          "dir/file1.txt",
-          "dir/file2.txt",
-          "file3.txt",
-          "dir/file4.zip",
-          "file5.zip"
+          "cats/dir/file1.txt",
+          "cats/dir/file2.txt",
+          "cats/file3.txt",
+          "cats/dir/file4.zip",
+          "cats/file5.zip"
       ).forEach(consumer::accept);
       return null;
     }).when(s3).forEachKey(eq("foo-bucket"), eq("cats/"), any(Consumer.class));
@@ -432,12 +432,12 @@ class S3CpCommandsTest {
     doAnswer(invocation -> {
       Consumer<String> consumer = invocation.getArgument(2, Consumer.class);
       Arrays.asList(
-          "dir/file1.txt",
-          "dir/file2.txt",
-          "file3.txt",
-          "dir/file4.zip",
-          "file5.zip",
-          "cats.zip"
+          "cats/dir/file1.txt",
+          "cats/dir/file2.txt",
+          "cats/file3.txt",
+          "cats/dir/file4.zip",
+          "cats/file5.zip",
+          "cats/cats.zip"
       ).forEach(consumer::accept);
       return null;
     }).when(s3).forEachKey(eq("foo-bucket"), eq("cats/"), any(Consumer.class));
@@ -476,9 +476,9 @@ class S3CpCommandsTest {
     doAnswer(invocation -> {
       Consumer<String> consumer = invocation.getArgument(2, Consumer.class);
       Arrays.asList(
-          "dir/file1.txt",
-          "dir/file2.txt",
-          "file3.txt"
+          "source-dir/dir/file1.txt",
+          "source-dir/dir/file2.txt",
+          "source-dir/file3.txt"
       ).forEach(consumer::accept);
       return null;
     }).when(s3).forEachKey(eq("source-bucket"), eq("source-dir/"), any(Consumer.class));
@@ -557,11 +557,11 @@ class S3CpCommandsTest {
     doAnswer(invocation -> {
       Consumer<String> consumer = invocation.getArgument(2, Consumer.class);
       Arrays.asList(
-          "dir/file1.txt",
-          "dir/file2.txt",
-          "file3.txt",
-          "dir/file4.zip",
-          "file5.zip"
+          "source-dir/dir/file1.txt",
+          "source-dir/dir/file2.txt",
+          "source-dir/file3.txt",
+          "source-dir/dir/file4.zip",
+          "source-dir/file5.zip"
       ).forEach(consumer::accept);
       return null;
     }).when(s3).forEachKey(eq("source-bucket"), eq("source-dir/"), any(Consumer.class));
@@ -584,11 +584,11 @@ class S3CpCommandsTest {
     doAnswer(invocation -> {
       Consumer<String> consumer = invocation.getArgument(2, Consumer.class);
       Arrays.asList(
-          "dir/file1.txt",
-          "dir/file2.txt",
-          "file3.txt",
-          "dir/file4.zip",
-          "file5.zip"
+          "source-dir/dir/file1.txt",
+          "source-dir/dir/file2.txt",
+          "source-dir/file3.txt",
+          "source-dir/dir/file4.zip",
+          "source-dir/file5.zip"
       ).forEach(consumer::accept);
       return null;
     }).when(s3).forEachKey(eq("source-bucket"), eq("source-dir/"), any(Consumer.class));
@@ -612,11 +612,11 @@ class S3CpCommandsTest {
     doAnswer(invocation -> {
       Consumer<String> consumer = invocation.getArgument(2, Consumer.class);
       Arrays.asList(
-          "dir/file1.txt",
-          "dir/file2.txt",
-          "file3.txt",
-          "dir/file4.zip",
-          "file5.zip"
+          "source-dir/dir/file1.txt",
+          "source-dir/dir/file2.txt",
+          "source-dir/file3.txt",
+          "source-dir/dir/file4.zip",
+          "source-dir/file5.zip"
       ).forEach(consumer::accept);
       return null;
     }).when(s3).forEachKey(eq("source-bucket"), eq("source-dir/"), any(Consumer.class));
@@ -642,11 +642,11 @@ class S3CpCommandsTest {
     doAnswer(invocation -> {
       Consumer<String> consumer = invocation.getArgument(2, Consumer.class);
       Arrays.asList(
-          "dir/file1.txt",
-          "dir/file2.txt",
-          "file3.txt",
-          "dir/file4.zip",
-          "file5.zip"
+          "source-dir/dir/file1.txt",
+          "source-dir/dir/file2.txt",
+          "source-dir/file3.txt",
+          "source-dir/dir/file4.zip",
+          "source-dir/file5.zip"
       ).forEach(consumer::accept);
       return null;
     }).when(s3).forEachKey(eq("source-bucket"), eq("source-dir/"), any(Consumer.class));
@@ -670,12 +670,12 @@ class S3CpCommandsTest {
     doAnswer(invocation -> {
       Consumer<String> consumer = invocation.getArgument(2, Consumer.class);
       Arrays.asList(
-          "dir/file1.txt",
-          "dir/file2.txt",
-          "file3.txt",
-          "dir/file4.zip",
-          "file5.zip",
-          "cats.zip"
+          "source-dir/dir/file1.txt",
+          "source-dir/dir/file2.txt",
+          "source-dir/file3.txt",
+          "source-dir/dir/file4.zip",
+          "source-dir/file5.zip",
+          "source-dir/cats.zip"
       ).forEach(consumer::accept);
       return null;
     }).when(s3).forEachKey(eq("source-bucket"), eq("source-dir/"), any(Consumer.class));
