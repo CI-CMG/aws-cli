@@ -20,7 +20,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: build with maven
-        run: mvn -B -s settings.xml clean deploy -Pit
+        run: mvn -B -s settings.xml clean deploy
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
           SIGN_KEY_PASS: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jar
-          path: "aws-cli-${{ env.version }}-exe.jar"
+          path: "target/aws-cli-${{ env.version }}-exe.jar"
   release:
     needs:
       - build
