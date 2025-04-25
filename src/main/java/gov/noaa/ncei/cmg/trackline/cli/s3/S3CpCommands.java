@@ -1,7 +1,9 @@
 package gov.noaa.ncei.cmg.trackline.cli.s3;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.AmazonS3URI;
+import gov.noaa.ncei.cmg.trackline.cli.AwsCommands;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -39,7 +41,7 @@ public class S3CpCommands implements Runnable {
 
   @Override
   public void run() {
-    new S3CpCommandsHandler(new S3OperationsImpl(AmazonS3ClientBuilder.defaultClient()),
+    new S3CpCommandsHandler(new S3OperationsImpl(AwsCommands.getS3()),
         source,
         target,
         recursive,
@@ -115,12 +117,13 @@ public class S3CpCommands implements Runnable {
       String targetKey = S3Utils.normalize(tUri.getKey());
 
       if (recursive) {
-        String prefix = sourceKey.isEmpty() ? sourceKey : sourceKey + "/";
-        s3.forEachKey(sourceBucket, prefix, key -> {
-
-          if(incExc(Paths.get(key))) {
-            String tk = targetKey.isEmpty() ? key : targetKey + "/" + key;
-            s3.copy(sourceBucket, key, targetBucket, tk);
+        String sourcePrefix = sourceKey.isEmpty() ? sourceKey : sourceKey + "/";
+        String targetPrefix = targetKey.isEmpty() ? targetKey : targetKey + "/";
+        s3.forEachKey(sourceBucket, sourcePrefix, key -> {
+          String relativePath = sourcePrefix.isEmpty() ? key : S3Utils.normalize(key).replaceAll("^" + sourcePrefix, "");
+          String targetPath = targetPrefix.isEmpty() ? relativePath : targetPrefix + relativePath;
+          if(incExc(Paths.get(relativePath))) {
+            s3.copy(sourceBucket, key, targetBucket, targetPath);
           }
 
         });
@@ -139,9 +142,9 @@ public class S3CpCommands implements Runnable {
       if (recursive) {
         String prefix = sourceKey.isEmpty() ? sourceKey : sourceKey + "/";
         s3.forEachKey(sourceBucket, prefix, key -> {
-
-          if(incExc(Paths.get(key))) {
-            Path destFile = dest.resolve(key);
+          String resolvedPath = prefix.isEmpty() ? key : S3Utils.normalize(key).replaceAll("^" + prefix, "");
+          if(incExc(Paths.get(resolvedPath))) {
+            Path destFile = dest.resolve(resolvedPath);
             s3.download(sourceBucket, key, destFile);
           }
 

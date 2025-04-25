@@ -2,6 +2,7 @@ package gov.noaa.ncei.cmg.trackline.cli.s3;
 
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.AmazonS3URI;
+import gov.noaa.ncei.cmg.trackline.cli.AwsCommands;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +31,7 @@ public class S3RmCommands implements Runnable {
 
   @Override
   public void run() {
-    new S3RmCommandsHandler(new S3OperationsImpl(AmazonS3ClientBuilder.defaultClient()),
+    new S3RmCommandsHandler(new S3OperationsImpl(AwsCommands.getS3()),
         path,
         recursive,
         include,
@@ -68,8 +69,8 @@ public class S3RmCommands implements Runnable {
       if (recursive) {
         String prefix = victim.isEmpty() ? victim : victim + "/";
         s3.forEachKey(bucket, prefix, key -> {
-
-          if(incExc(Paths.get(key))) {
+          String resolvedPath = prefix.isEmpty() ? key : S3Utils.normalize(key).replaceAll("^" + prefix, "");
+          if(incExc(Paths.get(resolvedPath))) {
             s3.deleteObject(bucket, key);
           }
 

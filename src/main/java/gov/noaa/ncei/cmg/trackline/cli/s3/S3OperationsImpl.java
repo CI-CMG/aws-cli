@@ -29,9 +29,8 @@ public class S3OperationsImpl implements S3Operations {
   public void upload(Path source, String targetBucket, String targetKey) {
     System.out.println("Uploading " + source + " to " + "s3://" + targetBucket + "/" + targetKey);
     TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(s3).build();
-    long startTime = System.currentTimeMillis();
     Upload upload = transferManager.upload(targetBucket, targetKey, source.toFile());
-    transfer(startTime, upload);
+    transfer(upload);
     transferManager.shutdownNow(false);
   }
 
@@ -52,9 +51,8 @@ public class S3OperationsImpl implements S3Operations {
     System.out.println("Downloading " + "s3://" + sourceBucket + "/" + sourceKey + " to " + target);
     createParent(target);
     TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(s3).build();
-    long startTime = System.currentTimeMillis();
     Download download = transferManager.download(sourceBucket, sourceKey, target.toFile());
-    transfer(startTime, download);
+    transfer(download);
     transferManager.shutdownNow(false);
     System.out.println();
   }
@@ -69,9 +67,8 @@ public class S3OperationsImpl implements S3Operations {
 
     System.out.println("Copying " + "s3://" + sourceBucket + "/" + sourceKey + " to " + "s3://" + targetBucket + "/" + targetKey);
     TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(s3).build();
-    long startTime = System.currentTimeMillis();
     Copy copy = transferManager.copy(sourceBucket, sourceKey, targetBucket, targetKey);
-    transfer(startTime, copy);
+    transfer(copy);
     transferManager.shutdownNow(false);
     System.out.println();
   }
@@ -95,7 +92,7 @@ public class S3OperationsImpl implements S3Operations {
     System.out.format(erase_bar);
   }
 
-  private void transfer(long startTime, Transfer transfer) {
+  private void transfer(Transfer transfer) {
     printProgressBar(0.0);
     do {
       try {
