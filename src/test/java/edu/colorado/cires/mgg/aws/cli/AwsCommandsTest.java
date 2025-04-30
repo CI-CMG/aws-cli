@@ -92,6 +92,7 @@ public class AwsCommandsTest {
 
       s3.putObject(b -> b.bucket(bucket).key("root.json"), RequestBody.fromString("{}", StandardCharsets.UTF_8));
       s3.putObject(b -> b.bucket(bucket).key("root/root.json"), RequestBody.fromString("{}", StandardCharsets.UTF_8));
+      s3.putObject(b -> b.bucket(bucket).key("root/3/"), RequestBody.fromString("{}", StandardCharsets.UTF_8));
 
       assertEquals(0, AwsCommands.runWithoutExit(new String[]{
           "s3",

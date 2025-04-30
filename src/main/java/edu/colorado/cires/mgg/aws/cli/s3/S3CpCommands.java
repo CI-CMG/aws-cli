@@ -138,12 +138,13 @@ public class S3CpCommands implements Runnable {
       if (recursive) {
         String prefix = sourceKey.isEmpty() ? sourceKey : sourceKey + "/";
         s3.forEachKey(sourceBucket, prefix, key -> {
-          String resolvedPath = prefix.isEmpty() ? key : S3Utils.normalize(key).replaceAll("^" + prefix, "");
-          if(incExc(Paths.get(resolvedPath))) {
+          if (!key.endsWith("/")) {
+            String resolvedPath = prefix.isEmpty() ? key : S3Utils.normalize(key).replaceAll("^" + prefix, "");
+          if (incExc(Paths.get(resolvedPath))) {
             Path destFile = dest.resolve(resolvedPath);
             s3.download(sourceBucket, key, destFile);
           }
-
+        }
         });
       } else {
         s3.download(sourceBucket, sourceKey, dest);
